@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-notifier
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  notifiers.yaml: |
+    notifiers:
+    - name: email_notifications
+      type: email
+      uid: notifier1
+      is_default: true
+      settings:
+        addresses: yosoifalso@gmail.com

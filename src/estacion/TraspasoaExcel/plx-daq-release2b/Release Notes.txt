@@ -1,0 +1,14 @@
+PLX-DAQ Release 2.0
+
+Replaced MSComm control with API calls.
+API modCOMM module written by David M. Hitchens, distributed freely.
+Updates to modCOMM for 64-bit VBA by Martin Hebel
+
+Overwhelming the serial port can cause the spreadsheet to close.
+
+Please use the included .chm help files until new docs are made. Nothing has changed in operation.
+
+Please see "About" and distibuted files for more information.
+
+
+
