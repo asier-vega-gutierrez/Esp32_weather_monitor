@@ -32,8 +32,6 @@ spec:
              mountPath: "/etc/grafana/provisioning/datasources/"
            - name: dashboardproviders
              mountPath: "/etc/grafana/provisioning/dashboards/"
-           - name: notifiers
-             mountPath: "/etc/grafana/provisioning/notifiers/"
          resources:
            requests:
             memory: "64Mi"
@@ -58,6 +56,3 @@ spec:
         - name: dashboards
           configMap:
             name: dashboards
-        - name: notifiers
-          configMap:
-            name: grafana-notifier

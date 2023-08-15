@@ -1,33 +1,19 @@
-Arreglar el tema de la creacion del namespace
 
+
+
+
+Arreglar el tema de la creacion del namespace
 
 
 grafana/grafana:7.3.4 
 
-
-Las alertas han dejado de funcionar no se si algo mas de esto tampoco funciona
-
 Hacer que no me pide contraseña
-
-mirar aber si el secrects hace falta
-
-logger=settings t=2023-08-14T13:04:12.118892005Z level=warn msg="\"sentry\" frontend logging provider is deprecated and will be removed in the next major version. Use \"grafana\" provider instead." 
-
-logger=provisioning.plugins t=2023-08-14T13:18:46.135426306Z level=error msg="Failed to read plugin provisioning files from directory" path=/etc/grafana/provisioning/plugins error="open /etc/grafana/provisioning/plugins: no such file or directory" 
-
-logger=provisioning.alerting t=2023-08-14T13:18:46.143600107Z level=error msg="can't read alerting provisioning files from directory" path=/etc/grafana/provisioning/alerting error="open /etc/grafana/provisioning/alerting: no such file or directory"    
-
-
-
-prom/prometheus:v2.22.2
-
-
-todo bien apriori
-
-
 
 flask-app
 
 quitar la ip no funciona
 
 hacer que esto funcione como solo de test de la arquitectura
+
+
+https://gist.github.com/Tugzrida/2c9fcf52571909cf60cbafc32413daf0

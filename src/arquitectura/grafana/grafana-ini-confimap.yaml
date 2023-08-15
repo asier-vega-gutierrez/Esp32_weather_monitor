@@ -7,6 +7,13 @@ metadata:
     app: grafana
 data:
   grafana.ini: |
+    [auth.anonymous]
+    # enable anonymous access 
+    enabled = true
+    # specify organization name that should be used for unauthenticated users
+    org_name = ORGANIZATION
+    # specify role for unauthenticated users
+    org_role = Viewer
     [analytics]
     check_for_updates = true
     [grafana_net]
