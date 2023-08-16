@@ -1,13 +1,10 @@
 
 
-
-
-Arreglar el tema de la creacion del namespace
-
-
 grafana/grafana:7.3.4 
 
 Hacer que no me pide contraseña
+EL configuration map ahy que borrarlo por separado, guradar los comandos para esto
+
 
 flask-app
 

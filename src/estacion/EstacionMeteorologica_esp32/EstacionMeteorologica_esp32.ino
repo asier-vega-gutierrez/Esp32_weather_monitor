@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include "time.h"
 #include "sntp.h"
+#include "DHT.h"
 
 //variables
 /*const int pulseDebounce = 250; //50
@@ -16,14 +17,24 @@ int newLineCount = 0;
 
 //Creates a server that listens for incoming connections on the specified port
 WiFiServer promSrv(80);
+
 //Led de comprovacion de estado, si esta apaga esta fuera de servicio
 int pinLed = 22;
+
 //Constantes para el temea de la sincronizacion del la hora
 const char* ntpServer1 = "pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 const long  gmtOffset_sec = 3600;
 const int   daylightOffset_sec = 3600;
 const char* time_zone = "CET-1CEST,M3.5.0,M10.5.0/3"; 
+
+//dht
+#define DHTPIN 4 
+#define DHTTYPE DHT11 
+DHT dht(DHTPIN, DHTTYPE);
+float humedad = 0;
+float temperatura = 0;
+
 
 void setup() {
 
@@ -35,7 +46,7 @@ void setup() {
   
   //Conexion a la red wifi
   Serial.print("Connecting to WiFi");
-  WiFi.begin("HUAWEI P smart 2019", "holahola");
+  WiFi.begin("", "");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(1000);
@@ -58,16 +69,26 @@ void setup() {
 
   //Inicio del servidor
   promSrv.begin();
+  //Inicio del sensor dht
+  dht.begin();
 
   //ORIGINAL
   //pinMode(D7, INPUT_PULLUP);
   //attachInterrupt(digitalPinToInterrupt(D7), pulse, RISING);
 
+  //Realizamos una primera leida de los sensores
+  leerSensores();
+
+  //Si toto de ha preparado corectemtn se enciende la led
   Serial.println("Ready!");
   digitalWrite(pinLed, HIGH);
+
 }
 
 void loop() {
+
+  //Actualizamos los valores de los sensores
+  leerSensores();
 
   //Si se pierde la conexion intentamos conectarnos de nuevo
   if (WiFi.status() != WL_CONNECTED) {
@@ -114,15 +135,15 @@ void loop() {
             client.print("Connection: close\n\n");
 
             //Texto que se vera en pantalla
-            client.print("# HELP water_today_litres Total litres of water used since midnight.\n");
-            client.print("# TYPE water_today_litres counter\n");
-            client.print("water_today_litres ");
-            client.print(0);
+            client.print("# HELP humidity_1 Percentage of Humidity\n");
+            client.print("# TYPE humidity_1 gauge\n");
+            client.print("humidity_1 ");
+            client.print(humedad);
             client.print("\n\n");
-            client.print("# HELP water_flowrate_lpm Current flowrate in litres per minute.\n");
-            client.print("# TYPE water_flowrate_lpm gauge\n");
-            client.print("water_flowrate_lpm ");
-            client.print(0);
+            client.print("# HELP temperature_in_celsius_1 Temperature in Celsius\n");
+            client.print("# TYPE temperature_in_celsius_1 gauge\n");
+            client.print("temperature_in_celsius_1 ");
+            client.print(temperatura);
             client.print("\n\n");
 
             client.print("\n");
@@ -145,8 +166,7 @@ void loop() {
 }*/
 
 //Para pintar la hora actual
-void printLocalTime()
-{
+void printLocalTime(){
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)){
     Serial.println("No time available (yet)");
@@ -156,8 +176,17 @@ void printLocalTime()
 }
 
 //Si se recive un ajuste de la hora se notifica
-void timeavailable(struct timeval *t)
-{
+void timeavailable(struct timeval *t){
   Serial.println("Got time adjustment from NTP!");
   printLocalTime();
+}
+
+//Funcion para leer todos los sensores de una vez
+void leerSensores(){
+  //dht
+  humedad = dht.readHumidity();
+  temperatura = dht.readTemperature();
+  if (isnan(humedad) || isnan(temperatura) ) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+  }
 }
