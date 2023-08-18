@@ -5,6 +5,8 @@ grafana/grafana:7.3.4
 Hacer que no me pide contraseña
 EL configuration map ahy que borrarlo por separado, guradar los comandos para esto
 
+del prometheus quitar el alertamanger
+
 
 flask-app
 

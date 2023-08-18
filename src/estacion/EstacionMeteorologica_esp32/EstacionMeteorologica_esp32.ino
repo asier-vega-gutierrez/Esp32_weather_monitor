@@ -5,48 +5,50 @@
 #include "DHT.h"
 
 //variables
-/*const int pulseDebounce = 250; //50
-const int flowRateTimeout = 20000;
-const float volPerPulse = 0.5;
-const float flowRatePerMs = 60000;
-volatile unsigned long secondLastPulse = 0;
-volatile unsigned long lastPulse = 0;*/
 volatile unsigned int pulses = 0;
 int lastResetDate = 0;
 int newLineCount = 0;
-
 //Creates a server that listens for incoming connections on the specified port
 WiFiServer promSrv(80);
-
-//Led de comprovacion de estado, si esta apaga esta fuera de servicio
-int pinLed = 22;
-
 //Constantes para el temea de la sincronizacion del la hora
 const char* ntpServer1 = "pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 const long  gmtOffset_sec = 3600;
 const int   daylightOffset_sec = 3600;
 const char* time_zone = "CET-1CEST,M3.5.0,M10.5.0/3"; 
-
-//dht
-#define DHTPIN 4 
+//LED (comprovar el estado del servidor)
+#define pinLED 22
+//DHT (temperatura y humedad)
+#define pinDHT 4 
 #define DHTTYPE DHT11 
-DHT dht(DHTPIN, DHTTYPE);
+DHT dht(pinDHT, DHTTYPE);
 float humedad = 0;
 float temperatura = 0;
-
+//LDR (Luz)
+#define pinLDR 32
+float luz = 0;
+//Rotary encoder (veleta)
+#define pinCLK 16
+#define pinDT 17
+int encoderPosCount = 0;
+int pinCLKLast;
+int CLKVal;
+float rotacion = 0;
 
 void setup() {
-
-  pinMode(pinLed, OUTPUT);
-  digitalWrite(pinLed, LOW);
+  
+  pinMode(pinLED, OUTPUT);
+  digitalWrite(pinLED, LOW);
+  pinMode(pinLDR, INPUT);
+  pinMode (pinCLK,INPUT);
+  pinMode (pinDT,INPUT);
 
   //Velocidad del puerto serie
   Serial.begin(9600);
   
   //Conexion a la red wifi
   Serial.print("Connecting to WiFi");
-  WiFi.begin("", "");
+  WiFi.begin("HUAWEI P smart 2019", "holahola");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(1000);
@@ -54,15 +56,7 @@ void setup() {
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
 
-  //ORIGINAL
-  //Fecha y hora del esp32
-  /*configTzTime("AEST-10:00:00AEDT-11:00:00,M10.1.0/02:00:00,M4.1.0/03:00:00", "au.pool.ntp.org");
-  struct tm localTime;
-  getLocalTime(&localTime);
-  lastResetDate = localTime.tm_mday;
-  Serial.println(&localTime, "It's currently %A %d %B %Y %H:%M:%S %Z");*/
-
-  //COMENTAR
+  //Esto es para el tema de la sincronizacion del reloj
   sntp_set_time_sync_notification_cb(timeavailable);
   sntp_servermode_dhcp(1);
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer1, ntpServer2);
@@ -72,17 +66,13 @@ void setup() {
   //Inicio del sensor dht
   dht.begin();
 
-  //ORIGINAL
-  //pinMode(D7, INPUT_PULLUP);
-  //attachInterrupt(digitalPinToInterrupt(D7), pulse, RISING);
-
   //Realizamos una primera leida de los sensores
   leerSensores();
 
   //Si toto de ha preparado corectemtn se enciende la led
   Serial.println("Ready!");
-  digitalWrite(pinLed, HIGH);
-
+  digitalWrite(pinLED, HIGH);
+  
 }
 
 void loop() {
@@ -143,7 +133,7 @@ void loop() {
             client.print("# HELP temperature_in_celsius_1 Temperature in Celsius\n");
             client.print("# TYPE temperature_in_celsius_1 gauge\n");
             client.print("temperature_in_celsius_1 ");
-            client.print(temperatura);
+            client.print(rotacion);
             client.print("\n\n");
 
             client.print("\n");
@@ -156,14 +146,6 @@ void loop() {
     }
   }
 }
-
-/*void pulse() {
-  if (millis() - lastPulse > pulseDebounce) {
-    pulses++;
-    secondLastPulse = lastPulse;
-    lastPulse = millis();
-  }
-}*/
 
 //Para pintar la hora actual
 void printLocalTime(){
@@ -183,10 +165,31 @@ void timeavailable(struct timeval *t){
 
 //Funcion para leer todos los sensores de una vez
 void leerSensores(){
-  //dht
+  //DHT
   humedad = dht.readHumidity();
   temperatura = dht.readTemperature();
-  if (isnan(humedad) || isnan(temperatura) ) {
+  if (isnan(humedad) || isnan(temperatura)) {
     Serial.println(F("Failed to read from DHT sensor!"));
   }
+  //LDR
+  luz = analogRead(pinLDR);
+  if (isnan(luz)) {
+    Serial.println(F("Failed to read from LDR sensor!"));
+  }
+  //Rotary
+  CLKVal = digitalRead(pinCLK);
+  if (CLKVal != pinCLKLast){ // Means the knob is rotating
+    if (digitalRead(pinDT) != CLKVal){ // Means pin CLK Changed first - We're 
+      encoderPosCount ++;
+    } 
+  else { // Otherwise DT changed first and we're 
+    encoderPosCount--;
+  }
+  rotacion = encoderPosCount;
+  }
+  pinCLKLast = CLKVal;
+}
+
+void convertirValores(){
+
 }

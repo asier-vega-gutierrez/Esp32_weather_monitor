@@ -19,10 +19,10 @@ data:
           - "alertmanager.monitoring.svc:9093"
 
     scrape_configs:
-      - job_name: my-application
+      - job_name: esp32
         honor_labels: true
         static_configs:
-        - targets: ['flask:5000']
+        - targets: ['192.168.43.211:80']
 
       
 
