@@ -133,7 +133,27 @@ void loop() {
             client.print("# HELP temperature_in_celsius_1 Temperature in Celsius\n");
             client.print("# TYPE temperature_in_celsius_1 gauge\n");
             client.print("temperature_in_celsius_1 ");
-            client.print(rotacion);
+            client.print(temperatura);
+            client.print("\n\n");
+            client.print("# HELP wind_speed_1 The speed of the wind in m/s\n");
+            client.print("# TYPE wind_speed_1 gauge\n");
+            client.print("wind_speed_1 ");
+            client.print(velocidad);
+            client.print("\n\n");
+            client.print("# HELP_wind_direction_1 The direction of the wind in degrees\n");
+            client.print("# TYPE wind_direction_1 gauge\n");
+            client.print("wind_direction_1 ");
+            client.print(direccion);
+            client.print("\n\n");
+            client.print("# HELP rain_precipitation 1 Rain precipitations in 1/m^2\n");
+            client.print("# TYPE rain_precipitation_1 gauge\n");
+            client.print("rain_precipitation_1 ");
+            client.print(precipitacion);
+            client.print("\n\n");
+            client.print("# HELP_light_level_1 Light level\n");
+            client.print("# TYPE light_level_1 gauge\n");
+            client.print("light_level_1 ");
+            client.print(luz);
             client.print("\n\n");
 
             client.print("\n");

@@ -1,18 +1,3 @@
 
-
-grafana/grafana:7.3.4 
-
-Hacer que no me pide contraseña
-EL configuration map ahy que borrarlo por separado, guradar los comandos para esto
-
-del prometheus quitar el alertamanger
-
-
-flask-app
-
-quitar la ip no funciona
-
-hacer que esto funcione como solo de test de la arquitectura
-
-
 https://gist.github.com/Tugzrida/2c9fcf52571909cf60cbafc32413daf0
+

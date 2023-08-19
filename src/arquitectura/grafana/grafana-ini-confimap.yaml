@@ -7,11 +7,6 @@ metadata:
     app: grafana
 data:
   grafana.ini: |
-    [auth.anonymous]
-    enabled = false
-    org_name = Main Org.
-    org_role = Editor
-    hide_version = true
     [analytics]
     check_for_updates = true
     [grafana_net]
