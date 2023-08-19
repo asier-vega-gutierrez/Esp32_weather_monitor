@@ -35,6 +35,18 @@ int pinCLKLast;
 int CLKVal;
 float rotacion = 0;
 
+//PI (anemometro)
+#define pinPI 18
+int anteriorA = HIGH;
+long int t1 = 0;
+long int t2 = 0;
+float velocidad = 0;
+
+//WL (pluviometro)
+#define pinWL 33
+float precipitacion = 0;
+int HistoryValue = 0;
+
 void setup() {
   
   pinMode(pinLED, OUTPUT);
@@ -42,6 +54,7 @@ void setup() {
   pinMode(pinLDR, INPUT);
   pinMode (pinCLK,INPUT);
   pinMode (pinDT,INPUT);
+  pinMode(pinPI, INPUT);
 
   //Velocidad del puerto serie
   Serial.begin(9600);
@@ -143,7 +156,7 @@ void loop() {
             client.print("# HELP_wind_direction_1 The direction of the wind in degrees\n");
             client.print("# TYPE wind_direction_1 gauge\n");
             client.print("wind_direction_1 ");
-            client.print(direccion);
+            client.print(rotacion);
             client.print("\n\n");
             client.print("# HELP rain_precipitation 1 Rain precipitations in 1/m^2\n");
             client.print("# TYPE rain_precipitation_1 gauge\n");
@@ -208,8 +221,32 @@ void leerSensores(){
   rotacion = encoderPosCount;
   }
   pinCLKLast = CLKVal;
+  //PI
+  t1 = millis();
+  t2 = t1;
+  int cont = 0;
+  while ((t2-t1) <= 100){
+    int actualA = digitalRead(18);
+    if ((anteriorA == 1) && (actualA == 0)){
+      cont = cont + 1;
+    }
+    t2 = millis();
+    anteriorA = actualA;
+  }
+  velocidad = (float(cont)/0.1)*60;
+  cont = 0;
+  //WL
+  precipitacion = analogRead(pinWL);
+
+  //convertimos las unidades de los valores que lo necesiten
+  //convertirValores();
 }
 
 void convertirValores(){
-
+  //Rotary
+  rotacion = rotacion * 360/40;
+  while (rotacion > 360){
+    rotacion = rotacion - 360;
+  }
+  Serial.println(rotacion);
 }
