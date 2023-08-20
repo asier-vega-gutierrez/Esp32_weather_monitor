@@ -34,14 +34,13 @@ int encoderPosCount = 0;
 int pinCLKLast;
 int CLKVal;
 float rotacion = 0;
-
+int grados = 0;
 //PI (anemometro)
 #define pinPI 18
 int anteriorA = HIGH;
 long int t1 = 0;
 long int t2 = 0;
 float velocidad = 0;
-
 //WL (pluviometro)
 #define pinWL 33
 float precipitacion = 0;
@@ -80,6 +79,7 @@ void setup() {
   dht.begin();
 
   //Realizamos una primera leida de los sensores
+  pinCLKLast = digitalRead(pinCLK); //se deve iniciar el punto de partida del encoder
   leerSensores();
 
   //Si toto de ha preparado corectemtn se enciende la led
@@ -98,9 +98,11 @@ void loop() {
     Serial.println("Reconnecting to WiFi");
     WiFi.begin();
     while (WiFi.status() != WL_CONNECTED) {
+      digitalWrite(pinLED, LOW);
       Serial.print(".");
       delay(1000);
     }
+    digitalWrite(pinLED, HIGH);
     Serial.print("Connected as ");
     Serial.println(WiFi.localIP());
   }
@@ -156,7 +158,7 @@ void loop() {
             client.print("# HELP_wind_direction_1 The direction of the wind in degrees\n");
             client.print("# TYPE wind_direction_1 gauge\n");
             client.print("wind_direction_1 ");
-            client.print(rotacion);
+            client.print(grados);
             client.print("\n\n");
             client.print("# HELP rain_precipitation 1 Rain precipitations in 1/m^2\n");
             client.print("# TYPE rain_precipitation_1 gauge\n");
@@ -215,10 +217,10 @@ void leerSensores(){
     if (digitalRead(pinDT) != CLKVal){ // Means pin CLK Changed first - We're 
       encoderPosCount ++;
     } 
-  else { // Otherwise DT changed first and we're 
-    encoderPosCount--;
-  }
-  rotacion = encoderPosCount;
+    else { // Otherwise DT changed first and we're 
+      encoderPosCount--;
+    }
+    rotacion = encoderPosCount;
   }
   pinCLKLast = CLKVal;
   //PI
@@ -239,14 +241,16 @@ void leerSensores(){
   precipitacion = analogRead(pinWL);
 
   //convertimos las unidades de los valores que lo necesiten
-  //convertirValores();
+  convertirValores();
 }
 
 void convertirValores(){
   //Rotary
-  rotacion = rotacion * 360/40;
+  grados = rotacion * 360/40;
   while (rotacion > 360){
     rotacion = rotacion - 360;
   }
-  Serial.println(rotacion);
+  while (rotacion < -360){
+    rotacion = rotacion - 360;
+  }
 }
